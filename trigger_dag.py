@@ -5,7 +5,6 @@
 #     "requests>=2.32",
 # ]
 # ///
-import os
 import sys
 import uuid
 from datetime import datetime, timezone
@@ -13,14 +12,13 @@ from datetime import datetime, timezone
 import requests
 from azure.identity import DefaultAzureCredential
 
+AIRFLOW_BASE_URL = "https://airflow.interne.mon-domaine.local"
 DAG_NAME = "dag_to_launch"
 AZURE_CLIENT_ID = "00000000-0000-0000-0000-000000000000"
 AZURE_SCOPE = f"api://{AZURE_CLIENT_ID}/.default"
 
 
 def main() -> int:
-    base_url = os.environ["AIRFLOW_BASE_URL"].rstrip("/")
-
     credential = DefaultAzureCredential()
     token = credential.get_token(AZURE_SCOPE).token
 
@@ -31,7 +29,7 @@ def main() -> int:
         "conf": {},
     }
 
-    url = f"{base_url}/api/v2/dags/{DAG_NAME}/dagRuns"
+    url = f"{AIRFLOW_BASE_URL.rstrip('/')}/api/v2/dags/{DAG_NAME}/dagRuns"
     response = requests.post(
         url,
         json=payload,
